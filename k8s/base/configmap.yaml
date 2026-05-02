@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: walkguide-config
+data:
+  NODE_ENV: production
+  REDIS_URL: redis://walkguide-redis:6379
+  BETTERAUTH_URL: https://walkguide.example.com
+  # NEXT_PUBLIC_GMAPS_KEY is baked into the image at build time, not here

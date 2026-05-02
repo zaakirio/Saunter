@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: walkguide-redis
+spec:
+  replicas: 1
+  strategy: { type: Recreate }
+  selector:
+    matchLabels: { app: walkguide-redis }
+  template:
+    metadata:
+      labels: { app: walkguide-redis }
+    spec:
+      containers:
+        - name: redis
+          image: redis:7-alpine
+          args: ["--appendonly", "yes"]
+          ports: [{ containerPort: 6379 }]
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          resources:
+            requests: { cpu: "50m", memory: "64Mi" }
+            limits: { cpu: "200m", memory: "256Mi" }
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: walkguide-redis

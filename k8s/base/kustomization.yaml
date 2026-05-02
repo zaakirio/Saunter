@@ -1,0 +1,17 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - deployment.yaml
+  - service.yaml
+  - ingress.yaml
+  - redis-deployment.yaml
+  - redis-pvc.yaml
+  - redis-service.yaml
+  - configmap.yaml
+  - sealed-secrets.yaml
+
+images:
+  - name: walkguide
+    newName: ghcr.io/REPLACE_OWNER/walkguide
+    newTag: latest

@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: walkguide
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: walkguide }
+  template:
+    metadata:
+      labels: { app: walkguide }
+    spec:
+      containers:
+        - name: walkguide
+          image: walkguide  # overridden by kustomize edit set image
+          ports: [{ containerPort: 3000 }]
+          envFrom:
+            - configMapRef: { name: walkguide-config }
+            - secretRef: { name: walkguide-secrets }
+          readinessProbe:
+            httpGet: { path: /api/health, port: 3000 }
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: { path: /api/health, port: 3000 }
+            initialDelaySeconds: 30
+            periodSeconds: 30
+          resources:
+            requests: { cpu: "100m", memory: "256Mi" }
+            limits: { cpu: "500m", memory: "512Mi" }

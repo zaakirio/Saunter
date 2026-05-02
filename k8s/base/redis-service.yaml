@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: walkguide-redis
+spec:
+  type: ClusterIP
+  selector: { app: walkguide-redis }
+  ports:
+    - port: 6379
+      targetPort: 6379
