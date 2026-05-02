@@ -42,13 +42,17 @@ This app deploys via ArgoCD. You need:
 5. **Encrypt your real secrets** with `kubeseal`:
 
    ```bash
-   echo -n 'YOUR_VALUE' > value.txt
+   # Sealed Secrets controller must be installed first.
+   # Adjust --controller-namespace if you installed it elsewhere.
    kubectl create secret generic walkguide-secrets \
      --dry-run=client \
-     --from-file=MONGODB_URI=value.txt \
-     --from-literal=BETTERAUTH_SECRET=... \
-     --from-literal=GOOGLE_OAUTH_CLIENT_ID=... \
-     ... \
+     --from-literal=MONGODB_URI='mongodb+srv://...' \
+     --from-literal=BETTERAUTH_SECRET="$(openssl rand -base64 32)" \
+     --from-literal=GOOGLE_OAUTH_CLIENT_ID='...' \
+     --from-literal=GOOGLE_OAUTH_CLIENT_SECRET='...' \
+     --from-literal=GOOGLE_PLACES_KEY='...' \
+     --from-literal=GRAPHHOPPER_KEY='...' \
+     --from-literal=MAPBOX_KEY='...' \
      -o yaml \
      | kubeseal --format yaml --controller-namespace=kube-system \
      > k8s/base/sealed-secrets.yaml
@@ -68,3 +72,5 @@ When forking this repo, update these placeholder strings to match your own infra
 
 - `REPLACE_OWNER` in `k8s/base/kustomization.yaml`, `k8s/overlays/prod/kustomization.yaml`, and `argocd/walkguide.yaml`
 - `walkguide.example.com` in `k8s/base/ingress.yaml` (and the dev hostname `walkguide.dev.example.com` in `k8s/overlays/dev/kustomization.yaml`)
+- `BETTERAUTH_URL` value in `k8s/base/configmap.yaml` (currently `https://walkguide.example.com`)
+- `repoURL` in `argocd/walkguide.yaml` if the manifests repo is renamed from `walkguide-manifests`
