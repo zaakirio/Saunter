@@ -43,9 +43,12 @@ export function Header({ searchQuery, onSearchChange, onSearchSubmit, onSavedCli
         <Button variant="ghost" size="sm" onClick={onSavedClick}><Heart className="size-4 mr-1" />Saved</Button>
         <Button variant="ghost" size="sm" onClick={onHistoryClick}><History className="size-4 mr-1" />History</Button>
         {session ? (
-          <Button variant="ghost" size="sm" onClick={() => signOut()}>
-            <img src={session.user.image ?? ""} alt="" className="w-7 h-7 rounded-full" />
-          </Button>
+          <>
+            <a href="/preferences" className="rounded-full hover:opacity-80">
+              <img src={session.user.image ?? ""} alt="" className="w-7 h-7 rounded-full" />
+            </a>
+            <Button variant="ghost" size="sm" onClick={() => signOut()}>Sign out</Button>
+          </>
         ) : (
           <Button size="sm" onClick={() => signIn.social({ provider: "google" })}>Sign in</Button>
         )}
