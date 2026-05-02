@@ -1,0 +1,11 @@
+node_modules
+.next
+.git
+.env
+.env.local
+docs
+tests
+**/*.test.ts
+.github
+k8s
+argocd
