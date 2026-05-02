@@ -13,6 +13,11 @@ import { useRoute } from "@/hooks/use-route";
 import { useGeolocation } from "@/hooks/use-geolocation";
 import type { Place } from "@/components/place-input";
 import type { TravelMode } from "@/lib/route/types";
+import { usePois } from "@/hooks/use-pois";
+import { FilterChips } from "@/components/filter-chips";
+import { PoiMarkers } from "@/components/map/poi-markers";
+import type { POIType } from "@/lib/poi/types";
+import type { POI } from "@/lib/poi/types";
 
 export default function HomePage() {
   const [map, setMap] = useState<MLMap | null>(null);
@@ -27,6 +32,20 @@ export default function HomePage() {
   const { route, loading, search, clear } = useRoute();
   const { position } = useGeolocation();
   const [topQuery, setTopQuery] = useState("");
+
+  const [poiTypes, setPoiTypes] = useState<Set<POIType>>(new Set(["tourist_attraction", "museum", "cafe"]));
+  const togglePoiType = (t: POIType) =>
+    setPoiTypes(prev => {
+      const next = new Set(prev);
+      next.has(t) ? next.delete(t) : next.add(t);
+      return next;
+    });
+
+  const { pois } = usePois(route?.polyline ?? null, [...poiTypes]);
+
+  const handleSelectPoi = (p: POI) => {
+    if (map) map.flyTo({ center: p.location.coordinates, zoom: 16, duration: 600 });
+  };
 
   useEffect(() => {
     if (!pointA && position) {
@@ -100,6 +119,8 @@ export default function HomePage() {
               <RouteSummary route={route} onSave={() => { /* Task 41 */ }} saved={false} />
             </div>
           )}
+          <FilterChips enabled={poiTypes} onToggle={togglePoiType} />
+          <PoiMarkers map={map} pois={pois} onClick={handleSelectPoi} />
         </div>
         {route && (
           <WalkPanel
@@ -109,6 +130,8 @@ export default function HomePage() {
             gmapsKey={process.env.NEXT_PUBLIC_GMAPS_KEY ?? ""}
             onClose={clear}
             onStartGuided={() => { /* Plan 2 */ }}
+            pois={pois}
+            onSelectHighlight={handleSelectPoi}
           />
         )}
       </div>

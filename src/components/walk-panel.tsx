@@ -4,6 +4,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Play, X } from "lucide-react";
 import type { RouteResponse } from "@/lib/route/types";
 import { StepsList } from "./steps-list";
+import { HighlightsList } from "./highlights-list";
+import type { POI } from "@/lib/poi/types";
 
 type Props = {
   route: RouteResponse | null;
@@ -12,9 +14,11 @@ type Props = {
   gmapsKey: string;
   onClose: () => void;
   onStartGuided: () => void;
+  pois: POI[];
+  onSelectHighlight?: (p: POI) => void;
 };
 
-export function WalkPanel({ route, pointAName, pointBName, gmapsKey, onClose, onStartGuided }: Props) {
+export function WalkPanel({ route, pointAName, pointBName, gmapsKey, onClose, onStartGuided, pois, onSelectHighlight }: Props) {
   if (!route) return null;
   const km = (route.distance / 1000).toFixed(1);
   const min = Math.round(route.duration / 60);
@@ -39,7 +43,11 @@ export function WalkPanel({ route, pointAName, pointBName, gmapsKey, onClose, on
           <StepsList route={route} pointAName={pointAName} pointBName={pointBName} gmapsKey={gmapsKey} />
         </TabsContent>
         <TabsContent value="highlights" className="flex-1 overflow-hidden mt-0">
-          <div className="p-4 text-sm text-muted-foreground">Tour highlights will appear here once POIs load.</div>
+          <HighlightsList
+            pois={pois}
+            routeStart={route.polyline[0] ?? null}
+            onSelect={onSelectHighlight}
+          />
         </TabsContent>
       </Tabs>
       <div className="p-4 border-t">
