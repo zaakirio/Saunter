@@ -46,6 +46,7 @@ const SIGN_TO_MANEUVER: Record<number, string> = {
 export async function routeViaGraphHopper(req: RouteRequest): Promise<RouteResponse> {
   const customModel = buildCustomModel(req);
   const body: Record<string, unknown> = {
+    // GraphHopper POST accepts points as [lng, lat] tuples (matches our LngLat type)
     points: [req.from, req.to],
     profile: "foot",
     locale: "en",
