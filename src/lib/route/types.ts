@@ -15,7 +15,7 @@ export type RouteStep = {
   distance: number;        // meters from start of step
   duration: number;        // seconds
   instruction: string;
-  maneuver: string;        // "depart" | "left" | "right" | "arrive" | etc
+  maneuver: string;        // "depart" | "left" | "right" | "slight_left" | "slight_right" | "sharp_left" | "sharp_right" | "uturn" | "roundabout" | "continue" | "arrive"
   coords: LngLat[];
   thumbnailHint: LngLat;
 };
