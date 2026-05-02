@@ -1,4 +1,4 @@
-# WalkGuide
+# Saunter
 
 Walking-route planner with Street View immersive guided walks.
 

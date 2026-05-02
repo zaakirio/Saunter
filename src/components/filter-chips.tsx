@@ -17,14 +17,14 @@ const CHIPS: Array<{ key: POIType[]; label: string; Icon: typeof Camera }> = [
 
 export function FilterChips({ enabled, onToggle }: Props) {
   return (
-    <div className="absolute top-4 left-1/2 -translate-x-1/2 flex gap-2 bg-white rounded-full shadow-lg p-1 z-10 max-w-full overflow-x-auto">
+    <div className="absolute top-4 left-1/2 -translate-x-1/2 flex gap-2 bg-white rounded-full shadow-lg p-1 border border-slate-100 z-10 max-w-full overflow-x-auto">
       {CHIPS.map(({ key, label, Icon }) => {
         const isOn = key.some(k => enabled.has(k));
         return (
           <button
             key={label}
             onClick={() => key.forEach(k => onToggle(k))}
-            className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm whitespace-nowrap ${isOn ? "bg-blue-500 text-white" : "hover:bg-muted"}`}
+            className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm whitespace-nowrap ${isOn ? "bg-blue-500 text-white" : "hover:bg-slate-100 text-slate-700"}`}
           >
             <Icon className="size-4" /> {label}
           </button>

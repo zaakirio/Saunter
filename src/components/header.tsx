@@ -17,9 +17,28 @@ export function Header({ searchQuery, onSearchChange, onSearchSubmit, onSavedCli
   return (
     <header className="h-16 border-b bg-white flex items-center px-6 gap-6">
       <div className="flex items-center gap-2">
-        <div className="w-8 h-8 rounded-full bg-blue-500" />
+        <svg
+          className="w-9 h-9 text-blue-500"
+          viewBox="0 0 32 32"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-label="Saunter logo"
+        >
+          <path
+            d="M16 2C9.4 2 4 7.4 4 14c0 9 12 16 12 16s12-7 12-16c0-6.6-5.4-12-12-12z"
+            fill="currentColor"
+          />
+          <circle cx="16" cy="14" r="6" fill="white" />
+          <path
+            d="M14 11.5c0-.55.45-1 1-1s1 .45 1 1v3c0 .55-.45 1-1 1s-1-.45-1-1v-3z"
+            fill="#3b82f6"
+          />
+          <circle cx="18" cy="11.5" r="1" fill="#3b82f6" />
+          <circle cx="18" cy="14.5" r="1" fill="#3b82f6" />
+          <circle cx="18" cy="17.5" r="1" fill="#3b82f6" />
+        </svg>
         <div>
-          <div className="font-bold text-lg">WalkGuide</div>
+          <div className="font-bold text-lg">Saunter</div>
           <div className="text-xs text-muted-foreground">Explore. Walk. Discover.</div>
         </div>
       </div>

@@ -57,7 +57,7 @@ export function StepsList({ route, pointAName, pointBName, gmapsKey }: Props) {
             <img
               src={streetViewThumb(s.thumbnailHint, gmapsKey)}
               alt=""
-              className="w-20 h-14 rounded-md object-cover"
+              className="w-20 h-16 rounded-lg object-cover shadow-sm"
               loading="lazy"
             />
           </li>

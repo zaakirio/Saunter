@@ -2,7 +2,7 @@ import "./globals.css";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 export const metadata = {
-  title: "WalkGuide",
+  title: "Saunter",
   description: "Plan walking routes with guided street view tours",
 };
 

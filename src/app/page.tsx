@@ -20,6 +20,7 @@ import type { POIType } from "@/lib/poi/types";
 import type { POI } from "@/lib/poi/types";
 import { SavedDrawer } from "@/components/saved-drawer";
 import { HistoryDrawer } from "@/components/history-drawer";
+import { WeatherWidget } from "@/components/weather-widget";
 
 export default function HomePage() {
   const [map, setMap] = useState<MLMap | null>(null);
@@ -94,6 +95,8 @@ export default function HomePage() {
     });
 
   const { pois } = usePois(route?.polyline ?? null, [...poiTypes]);
+
+  const weatherCenter = pointA?.location.coordinates ?? position ?? null;
 
   const handleSelectPoi = (p: POI) => {
     if (map) map.flyTo({ center: p.location.coordinates, zoom: 16, duration: 600 });
@@ -174,6 +177,7 @@ export default function HomePage() {
             </div>
           )}
           <FilterChips enabled={poiTypes} onToggle={togglePoiType} />
+          <WeatherWidget position={weatherCenter} />
           <PoiMarkers map={map} pois={pois} onClick={handleSelectPoi} />
         </div>
         {route && (

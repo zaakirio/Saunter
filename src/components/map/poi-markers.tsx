@@ -20,15 +20,22 @@ const ICONS: Record<POIType, string> = {
 };
 
 function makeMarkerEl(poi: POI): HTMLElement {
-  const el = document.createElement("div");
-  el.style.cssText = `
-    width: 28px; height: 28px; border-radius: 50%;
-    background: ${COLORS[poi.type]}; color: white;
-    display: grid; place-items: center; font-size: 14px;
-    box-shadow: 0 2px 6px rgba(0,0,0,.25); cursor: pointer;`;
-  el.textContent = ICONS[poi.type] ?? "•";
-  el.title = poi.name;
-  return el;
+  const wrap = document.createElement("div");
+  wrap.style.cssText = `
+    width: 32px; height: 32px; border-radius: 50%;
+    background: ${COLORS[poi.type]};
+    display: grid; place-items: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,.25); cursor: pointer;
+    border: 2px solid white;`;
+  const inner = document.createElement("div");
+  inner.style.cssText = `
+    width: 22px; height: 22px; border-radius: 50%;
+    background: white; color: ${COLORS[poi.type]};
+    display: grid; place-items: center; font-size: 13px;`;
+  inner.textContent = ICONS[poi.type] ?? "•";
+  wrap.appendChild(inner);
+  wrap.title = poi.name;
+  return wrap;
 }
 
 type Props = { map: MLMap | null; pois: POI[]; onClick?: (p: POI) => void };
