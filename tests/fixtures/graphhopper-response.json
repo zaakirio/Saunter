@@ -1,0 +1,26 @@
+{
+  "paths": [
+    {
+      "distance": 4200,
+      "time": 3720000,
+      "ascend": 48,
+      "descend": 12,
+      "points": {
+        "type": "LineString",
+        "coordinates": [
+          [-122.46, 37.77],
+          [-122.45, 37.77],
+          [-122.39, 37.79]
+        ]
+      },
+      "instructions": [
+        { "text": "Head east on JFK Dr", "distance": 500, "time": 420000, "sign": 0, "interval": [0, 1] },
+        { "text": "Turn right onto 9th Ave", "distance": 350, "time": 280000, "sign": 2, "interval": [1, 2] },
+        { "text": "You have arrived", "distance": 0, "time": 0, "sign": 4, "interval": [2, 2] }
+      ],
+      "details": {
+        "elevation": [[0, 1, 12], [1, 2, 60]]
+      }
+    }
+  ]
+}
