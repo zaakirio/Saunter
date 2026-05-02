@@ -1,0 +1,23 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: walkguide-dev
+namePrefix: dev-
+
+resources:
+  - ../../base
+
+patches:
+  - target: { kind: Deployment, name: walkguide }
+    patch: |
+      - op: replace
+        path: /spec/replicas
+        value: 1
+  - target: { kind: Ingress, name: walkguide }
+    patch: |
+      - op: replace
+        path: /spec/rules/0/host
+        value: walkguide.dev.example.com
+      - op: replace
+        path: /spec/tls/0/hosts/0
+        value: walkguide.dev.example.com
