@@ -21,3 +21,11 @@ patches:
       - op: replace
         path: /spec/tls/0/hosts/0
         value: walkguide.dev.example.com
+  - target: { kind: ConfigMap, name: walkguide-config }
+    patch: |
+      - op: replace
+        path: /data/REDIS_URL
+        value: redis://dev-walkguide-redis:6379
+      - op: replace
+        path: /data/BETTERAUTH_URL
+        value: https://walkguide.dev.example.com
