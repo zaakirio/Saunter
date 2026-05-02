@@ -27,16 +27,26 @@ export function PlaceInput({ value, onChange, placeholder, proximity, badge }: P
   useEffect(() => {
     if (!query || query === value?.name) { setResults([]); return; }
     if (debounceRef.current) clearTimeout(debounceRef.current);
+    const ctrl = new AbortController();
     debounceRef.current = setTimeout(async () => {
-      const url = new URL("/api/geocode", window.location.origin);
-      url.searchParams.set("q", query);
-      if (proximity) url.searchParams.set("proximity", proximity.join(","));
-      const res = await fetch(url);
-      if (!res.ok) return;
-      const json = await res.json();
-      setResults(json.results);
-      setOpen(true);
+      try {
+        const url = new URL("/api/geocode", window.location.origin);
+        url.searchParams.set("q", query);
+        if (proximity) url.searchParams.set("proximity", proximity.join(","));
+        const res = await fetch(url, { signal: ctrl.signal });
+        if (!res.ok) return;
+        const json = await res.json();
+        setResults(json.results);
+        setOpen(true);
+      } catch (err) {
+        if ((err as Error).name === "AbortError") return;
+        // swallow other errors silently for v1
+      }
     }, 250);
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      ctrl.abort();
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
