@@ -1,0 +1,25 @@
+{
+  "elements": [
+    {
+      "type": "node",
+      "id": 12345,
+      "lat": 37.78,
+      "lon": -122.41,
+      "tags": { "amenity": "toilets", "name": "Public Restroom" }
+    },
+    {
+      "type": "node",
+      "id": 67890,
+      "lat": 37.79,
+      "lon": -122.40,
+      "tags": { "amenity": "drinking_water" }
+    },
+    {
+      "type": "node",
+      "id": 11111,
+      "lat": 37.795,
+      "lon": -122.395,
+      "tags": { "tourism": "viewpoint", "name": "Bay Vista" }
+    }
+  ]
+}
