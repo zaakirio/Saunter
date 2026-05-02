@@ -1,3 +1,16 @@
+// before any other imports — ensures env() succeeds on first call
+process.env.MONGODB_URI ||= "mongodb://localhost/test";
+process.env.BETTERAUTH_SECRET ||= "x".repeat(32);
+process.env.BETTERAUTH_URL ||= "http://localhost:3000";
+process.env.GOOGLE_OAUTH_CLIENT_ID ||= "test";
+process.env.GOOGLE_OAUTH_CLIENT_SECRET ||= "test";
+process.env.NEXT_PUBLIC_GMAPS_KEY ||= "test";
+process.env.GOOGLE_PLACES_KEY ||= "test";
+process.env.GRAPHHOPPER_KEY ||= "test";
+process.env.MAPBOX_KEY ||= "test";
+process.env.REDIS_URL ||= "redis://localhost:6379";
+process.env.NODE_ENV ||= "test";
+
 import { afterAll, afterEach, beforeAll } from "vitest";
 import { setupServer } from "msw/node";
 import { http, HttpResponse } from "msw";

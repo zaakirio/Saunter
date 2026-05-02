@@ -1,0 +1,14 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "id": "place.123",
+      "type": "Feature",
+      "place_type": ["place"],
+      "place_name": "Ferry Building, San Francisco, CA",
+      "center": [-122.3933, 37.7956],
+      "geometry": { "type": "Point", "coordinates": [-122.3933, 37.7956] },
+      "context": [{ "id": "region.123", "text": "California" }]
+    }
+  ]
+}
