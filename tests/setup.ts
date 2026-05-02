@@ -9,7 +9,8 @@ process.env.GOOGLE_PLACES_KEY ||= "test";
 process.env.GRAPHHOPPER_KEY ||= "test";
 process.env.MAPBOX_KEY ||= "test";
 process.env.REDIS_URL ||= "redis://localhost:6379";
-process.env.NODE_ENV ||= "test";
+// NODE_ENV is read-only in @types/node when narrowed; cast through writable record
+(process.env as Record<string, string>).NODE_ENV ||= "test";
 
 import { afterAll, afterEach, beforeAll } from "vitest";
 import { setupServer } from "msw/node";
