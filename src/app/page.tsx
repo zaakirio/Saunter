@@ -18,6 +18,8 @@ import { FilterChips } from "@/components/filter-chips";
 import { PoiMarkers } from "@/components/map/poi-markers";
 import type { POIType } from "@/lib/poi/types";
 import type { POI } from "@/lib/poi/types";
+import { SavedDrawer } from "@/components/saved-drawer";
+import { HistoryDrawer } from "@/components/history-drawer";
 
 export default function HomePage() {
   const [map, setMap] = useState<MLMap | null>(null);
@@ -32,6 +34,56 @@ export default function HomePage() {
   const { route, loading, search, clear } = useRoute();
   const { position } = useGeolocation();
   const [topQuery, setTopQuery] = useState("");
+
+  const [savedOpen, setSavedOpen] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [savedThisRoute, setSavedThisRoute] = useState(false);
+
+  const handleSave = async () => {
+    if (!route || !pointA || !pointB) return;
+    const res = await fetch("/api/routes", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        name: `${pointA.name} → ${pointB.name}`,
+        pointA: { name: pointA.name, location: pointA.location },
+        pointB: { name: pointB.name, location: pointB.location },
+        mode,
+        preferences: prefs,
+        polyline: route.polyline,
+        steps: route.steps,
+        distance: route.distance,
+        duration: route.duration,
+        elevationGain: route.elevationGain,
+        elevationProfile: route.elevationProfile,
+      }),
+    });
+    if (res.ok) setSavedThisRoute(true);
+    else if (res.status === 401) {
+      if (confirm("Sign in with Google to save routes?")) {
+        const { signIn } = await import("@/lib/auth-client");
+        signIn.social({ provider: "google" });
+      }
+    }
+  };
+
+  const handleLoadSaved = async (id: string) => {
+    const res = await fetch(`/api/routes/${id}`);
+    if (!res.ok) return;
+    const { route: saved } = await res.json();
+    setPointA({ id: "saved-a", name: saved.pointA.name, location: saved.pointA.location });
+    setPointB({ id: "saved-b", name: saved.pointB.name, location: saved.pointB.location });
+    setMode(saved.mode);
+    setPrefs(saved.preferences);
+    setSavedOpen(false);
+    // re-search to populate the route hook (simpler than hydrating directly)
+    search({
+      from: saved.pointA.location.coordinates,
+      to: saved.pointB.location.coordinates,
+      mode: saved.mode,
+      ...saved.preferences,
+    });
+  };
 
   const [poiTypes, setPoiTypes] = useState<Set<POIType>>(new Set(["tourist_attraction", "museum", "cafe"]));
   const togglePoiType = (t: POIType) =>
@@ -56,6 +108,8 @@ export default function HomePage() {
       });
     }
   }, [position, pointA]);
+
+  useEffect(() => { setSavedThisRoute(false); }, [route]);
 
   const handleSearch = async () => {
     if (!pointA || !pointB) return;
@@ -88,8 +142,8 @@ export default function HomePage() {
         searchQuery={topQuery}
         onSearchChange={setTopQuery}
         onSearchSubmit={handleTopSearch}
-        onSavedClick={() => { /* wired in Task 39 */ }}
-        onHistoryClick={() => { /* wired in Task 40 */ }}
+        onSavedClick={() => setSavedOpen(true)}
+        onHistoryClick={() => setHistoryOpen(true)}
       />
       <div className="flex-1 flex overflow-hidden">
         <PlanPanel
@@ -116,7 +170,7 @@ export default function HomePage() {
           <ElevationChart route={route} />
           {route && (
             <div className="absolute top-20 left-4 w-72 z-10">
-              <RouteSummary route={route} onSave={() => { /* Task 41 */ }} saved={false} />
+              <RouteSummary route={route} onSave={handleSave} saved={savedThisRoute} />
             </div>
           )}
           <FilterChips enabled={poiTypes} onToggle={togglePoiType} />
@@ -135,6 +189,8 @@ export default function HomePage() {
           />
         )}
       </div>
+      <SavedDrawer open={savedOpen} onOpenChange={setSavedOpen} onSelect={handleLoadSaved} />
+      <HistoryDrawer open={historyOpen} onOpenChange={setHistoryOpen} />
     </div>
   );
 }
