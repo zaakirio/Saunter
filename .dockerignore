@@ -1,11 +1,13 @@
 node_modules
 .next
 .git
-.env
-.env.local
+.env*
+!.env.example
 docs
 tests
 **/*.test.ts
 .github
 k8s
 argocd
+*.tsbuildinfo
+Plans
