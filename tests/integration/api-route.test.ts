@@ -70,4 +70,23 @@ describe("/api/route", () => {
     const res = await POST(req);
     expect(res.status).toBe(400);
   });
+
+  it("returns 502 when both routers fail", async () => {
+    server.use(
+      http.post("https://graphhopper.com/api/1/route", () =>
+        HttpResponse.error()),
+      http.get("https://maps.googleapis.com/maps/api/directions/json", () =>
+        HttpResponse.error()),
+    );
+    const req = new Request("http://x/api/route", {
+      method: "POST",
+      body: JSON.stringify(validBody),
+    });
+    const res = await POST(req);
+    expect(res.status).toBe(502);
+    const body = await res.json();
+    expect(body.error).toBe("routing failed");
+    expect(typeof body.graphhopper).toBe("string");
+    expect(typeof body.google).toBe("string");
+  });
 });

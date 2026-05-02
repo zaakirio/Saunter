@@ -5,6 +5,8 @@ import type { RouteRequest } from "@/lib/route/types";
 
 export const runtime = "nodejs";
 
+const errMsg = (e: unknown) => e instanceof Error ? e.message : String(e);
+
 const reqSchema = z.object({
   from: z.tuple([z.number(), z.number()]),
   to: z.tuple([z.number(), z.number()]),
@@ -33,8 +35,8 @@ export async function POST(req: Request) {
     } catch (gErr) {
       return Response.json({
         error: "routing failed",
-        graphhopper: (ghErr as Error).message,
-        google: (gErr as Error).message,
+        graphhopper: errMsg(ghErr),
+        google: errMsg(gErr),
       }, { status: 502 });
     }
   }
