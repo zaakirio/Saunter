@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { X, ChevronLeft, ChevronRight, Pause, Play as PlayIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { RouteResponse } from "@/lib/route/types";
@@ -8,6 +8,7 @@ import type { GuidedMode } from "@/lib/street-view/types";
 import { useStreetViewRoute } from "@/hooks/use-street-view-route";
 import { useAutoAdvance } from "@/hooks/use-auto-advance";
 import { useWatchPosition } from "@/hooks/use-watch-position";
+import { useArrival } from "@/hooks/use-arrival";
 import { haversineMeters } from "@/lib/geo/distance";
 import { nearestPolylineIndex, distanceFromPolyline } from "@/lib/street-view/route-snapper";
 import type { POI } from "@/lib/poi/types";
@@ -18,6 +19,7 @@ import { NextStepCard } from "./next-step-card";
 import { Minimap } from "./minimap";
 import { OffRouteBanner } from "./off-route-banner";
 import { HighlightCard } from "./highlight-card";
+import { ArrivalScreen } from "./arrival-screen";
 
 type Props = {
   route: RouteResponse;
@@ -64,6 +66,27 @@ export function GuidedWalkView({ route, pois, pointA, pointB, onExit }: Props) {
     });
     setActiveHighlight(nearby ?? null);
   }, [current, pois, dismissed]);
+
+  const [arrived, setArrived] = useState(false);
+
+  const handleArrive = useCallback(async () => {
+    setArrived(true);
+    fetch("/api/history", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        routeId: null,
+        routeSnapshot: {
+          pointA: { name: pointA.name },
+          pointB: { name: pointB.name },
+        },
+        modeUsed: mode,
+        completed: true,
+      }),
+    }).catch(() => {});
+  }, [pointA.name, pointB.name, mode]);
+
+  useArrival(current?.routeCoord ?? null, pointB.location.coordinates, handleArrive);
 
   // Find the next step (whose start is past the current densified point)
   const stepInfo = useMemo(() => {
@@ -184,6 +207,15 @@ export function GuidedWalkView({ route, pois, pointA, pointB, onExit }: Props) {
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 pointer-events-auto">
         <ModeToggle mode={mode} onChange={setMode} gpsAvailable={gps.available} />
       </div>
+
+      {arrived && (
+        <ArrivalScreen
+          destinationName={pointB.name}
+          durationMin={Math.round(route.duration / 60)}
+          distanceKm={route.distance / 1000}
+          onClose={onExit}
+        />
+      )}
     </div>
   );
 }
