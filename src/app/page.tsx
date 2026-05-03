@@ -200,6 +200,7 @@ export default function HomePage() {
       {walkActive && route && pointA && pointB && (
         <GuidedWalkView
           route={route}
+          pois={pois}
           pointA={pointA}
           pointB={pointB}
           onExit={() => setWalkActive(false)}

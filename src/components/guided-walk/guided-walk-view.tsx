@@ -10,20 +10,24 @@ import { useAutoAdvance } from "@/hooks/use-auto-advance";
 import { useWatchPosition } from "@/hooks/use-watch-position";
 import { haversineMeters } from "@/lib/geo/distance";
 import { nearestPolylineIndex, distanceFromPolyline } from "@/lib/street-view/route-snapper";
+import type { POI } from "@/lib/poi/types";
+import { HIGHLIGHT_TYPES } from "@/lib/poi/types";
 import { StreetViewPanorama } from "./street-view-panorama";
 import { ModeToggle } from "./mode-toggle";
 import { NextStepCard } from "./next-step-card";
 import { Minimap } from "./minimap";
 import { OffRouteBanner } from "./off-route-banner";
+import { HighlightCard } from "./highlight-card";
 
 type Props = {
   route: RouteResponse;
+  pois: POI[];
   pointA: { name: string; location: { coordinates: LngLat } };
   pointB: { name: string; location: { coordinates: LngLat } };
   onExit: () => void;
 };
 
-export function GuidedWalkView({ route, pointA, pointB, onExit }: Props) {
+export function GuidedWalkView({ route, pois, pointA, pointB, onExit }: Props) {
   const [mode, setMode] = useState<GuidedMode>("click");
   const { ready, current, index, total, densified, advance, back, jumpTo, isAtEnd } =
     useStreetViewRoute(route.polyline);
@@ -46,6 +50,20 @@ export function GuidedWalkView({ route, pointA, pointB, onExit }: Props) {
     const targetIdx = nearestPolylineIndex(gps.position, densified);
     if (targetIdx !== index) jumpTo(targetIdx);
   }, [mode, gps.position, densified, index, jumpTo]);
+
+  const [activeHighlight, setActiveHighlight] = useState<POI | null>(null);
+  const [dismissed, setDismissed] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (!current?.routeCoord) { setActiveHighlight(null); return; }
+    const highlights = pois.filter(p => HIGHLIGHT_TYPES.has(p.type) || p.type === "cafe");
+    const nearby = highlights.find(p => {
+      const id = `${p.source}-${p.externalId}`;
+      if (dismissed.has(id)) return false;
+      return haversineMeters(current.routeCoord, p.location.coordinates) <= 30;
+    });
+    setActiveHighlight(nearby ?? null);
+  }, [current, pois, dismissed]);
 
   // Find the next step (whose start is past the current densified point)
   const stepInfo = useMemo(() => {
@@ -130,6 +148,20 @@ export function GuidedWalkView({ route, pointA, pointB, onExit }: Props) {
             <ChevronRight className="size-10 drop-shadow-lg ml-auto" />
           </button>
         </>
+      )}
+
+      {activeHighlight && (
+        <HighlightCard
+          poi={activeHighlight}
+          onDismiss={() => {
+            setDismissed(d => {
+              const next = new Set(d);
+              next.add(`${activeHighlight.source}-${activeHighlight.externalId}`);
+              return next;
+            });
+            setActiveHighlight(null);
+          }}
+        />
       )}
 
       {/* Minimap inset */}
