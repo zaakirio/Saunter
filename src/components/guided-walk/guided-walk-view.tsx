@@ -14,6 +14,7 @@ import { StreetViewPanorama } from "./street-view-panorama";
 import { ModeToggle } from "./mode-toggle";
 import { NextStepCard } from "./next-step-card";
 import { Minimap } from "./minimap";
+import { OffRouteBanner } from "./off-route-banner";
 
 type Props = {
   route: RouteResponse;
@@ -33,6 +34,12 @@ export function GuidedWalkView({ route, pointA, pointB, onExit }: Props) {
   });
 
   const gps = useWatchPosition(mode === "gps");
+
+  const offRoute =
+    mode === "gps" &&
+    !!gps.position &&
+    densified.length > 0 &&
+    distanceFromPolyline(gps.position, densified) > 50;
 
   useEffect(() => {
     if (mode !== "gps" || !gps.position || densified.length === 0) return;
@@ -90,6 +97,14 @@ export function GuidedWalkView({ route, pointA, pointB, onExit }: Props) {
           {index + 1} / {total}
         </div>
       </div>
+
+      {offRoute && (
+        <OffRouteBanner
+          onRecenter={() => {
+            if (gps.position) jumpTo(nearestPolylineIndex(gps.position, densified));
+          }}
+        />
+      )}
 
       {/* Right: next step card */}
       <div className="absolute top-20 right-4 pointer-events-auto">
