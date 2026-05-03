@@ -21,6 +21,7 @@ import type { POI } from "@/lib/poi/types";
 import { SavedDrawer } from "@/components/saved-drawer";
 import { HistoryDrawer } from "@/components/history-drawer";
 import { WeatherWidget } from "@/components/weather-widget";
+import { GuidedWalkView } from "@/components/guided-walk/guided-walk-view";
 
 export default function HomePage() {
   const [map, setMap] = useState<MLMap | null>(null);
@@ -39,6 +40,7 @@ export default function HomePage() {
   const [savedOpen, setSavedOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [savedThisRoute, setSavedThisRoute] = useState(false);
+  const [walkActive, setWalkActive] = useState(false);
 
   const handleSave = async () => {
     if (!route || !pointA || !pointB) return;
@@ -187,7 +189,7 @@ export default function HomePage() {
             pointBName={pointB?.name ?? ""}
             gmapsKey={process.env.NEXT_PUBLIC_GMAPS_KEY ?? ""}
             onClose={clear}
-            onStartGuided={() => { /* Plan 2 */ }}
+            onStartGuided={() => setWalkActive(true)}
             pois={pois}
             onSelectHighlight={handleSelectPoi}
           />
@@ -195,6 +197,14 @@ export default function HomePage() {
       </div>
       <SavedDrawer open={savedOpen} onOpenChange={setSavedOpen} onSelect={handleLoadSaved} />
       <HistoryDrawer open={historyOpen} onOpenChange={setHistoryOpen} />
+      {walkActive && route && pointA && pointB && (
+        <GuidedWalkView
+          route={route}
+          pointA={pointA}
+          pointB={pointB}
+          onExit={() => setWalkActive(false)}
+        />
+      )}
     </div>
   );
 }
