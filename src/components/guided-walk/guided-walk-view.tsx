@@ -1,11 +1,12 @@
 "use client";
 import { useEffect, useState, useMemo } from "react";
-import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Pause, Play as PlayIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { RouteResponse } from "@/lib/route/types";
 import type { LngLat } from "@/lib/geo/distance";
 import type { GuidedMode } from "@/lib/street-view/types";
 import { useStreetViewRoute } from "@/hooks/use-street-view-route";
+import { useAutoAdvance } from "@/hooks/use-auto-advance";
 import { haversineMeters } from "@/lib/geo/distance";
 import { StreetViewPanorama } from "./street-view-panorama";
 import { ModeToggle } from "./mode-toggle";
@@ -23,6 +24,11 @@ export function GuidedWalkView({ route, pointA, pointB, onExit }: Props) {
   const [mode, setMode] = useState<GuidedMode>("click");
   const { ready, current, index, total, densified, advance, back, isAtEnd } =
     useStreetViewRoute(route.polyline);
+
+  const auto = useAutoAdvance({
+    enabled: mode === "auto" && !isAtEnd,
+    onTick: advance,
+  });
 
   // Find the next step (whose start is past the current densified point)
   const stepInfo = useMemo(() => {
@@ -103,6 +109,19 @@ export function GuidedWalkView({ route, pointA, pointB, onExit }: Props) {
 
       {/* Minimap inset */}
       <Minimap polyline={route.polyline} currentCoord={current?.routeCoord ?? null} />
+
+      {/* Auto-mode play/pause button */}
+      {mode === "auto" && (
+        <div className="absolute bottom-24 left-1/2 -translate-x-1/2 pointer-events-auto">
+          <button
+            onClick={auto.toggle}
+            className="bg-white rounded-full shadow-lg w-12 h-12 grid place-items-center hover:bg-slate-50"
+            aria-label={auto.running ? "Pause" : "Resume"}
+          >
+            {auto.running ? <Pause className="size-5" /> : <PlayIcon className="size-5" />}
+          </button>
+        </div>
+      )}
 
       {/* Bottom: mode toggle */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 pointer-events-auto">
