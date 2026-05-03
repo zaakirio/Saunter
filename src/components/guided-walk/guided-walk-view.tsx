@@ -7,7 +7,9 @@ import type { LngLat } from "@/lib/geo/distance";
 import type { GuidedMode } from "@/lib/street-view/types";
 import { useStreetViewRoute } from "@/hooks/use-street-view-route";
 import { useAutoAdvance } from "@/hooks/use-auto-advance";
+import { useWatchPosition } from "@/hooks/use-watch-position";
 import { haversineMeters } from "@/lib/geo/distance";
+import { nearestPolylineIndex, distanceFromPolyline } from "@/lib/street-view/route-snapper";
 import { StreetViewPanorama } from "./street-view-panorama";
 import { ModeToggle } from "./mode-toggle";
 import { NextStepCard } from "./next-step-card";
@@ -22,13 +24,21 @@ type Props = {
 
 export function GuidedWalkView({ route, pointA, pointB, onExit }: Props) {
   const [mode, setMode] = useState<GuidedMode>("click");
-  const { ready, current, index, total, densified, advance, back, isAtEnd } =
+  const { ready, current, index, total, densified, advance, back, jumpTo, isAtEnd } =
     useStreetViewRoute(route.polyline);
 
   const auto = useAutoAdvance({
     enabled: mode === "auto" && !isAtEnd,
     onTick: advance,
   });
+
+  const gps = useWatchPosition(mode === "gps");
+
+  useEffect(() => {
+    if (mode !== "gps" || !gps.position || densified.length === 0) return;
+    const targetIdx = nearestPolylineIndex(gps.position, densified);
+    if (targetIdx !== index) jumpTo(targetIdx);
+  }, [mode, gps.position, densified, index, jumpTo]);
 
   // Find the next step (whose start is past the current densified point)
   const stepInfo = useMemo(() => {
@@ -125,7 +135,7 @@ export function GuidedWalkView({ route, pointA, pointB, onExit }: Props) {
 
       {/* Bottom: mode toggle */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 pointer-events-auto">
-        <ModeToggle mode={mode} onChange={setMode} gpsAvailable={false /* enabled in Task 15 */} />
+        <ModeToggle mode={mode} onChange={setMode} gpsAvailable={gps.available} />
       </div>
     </div>
   );
